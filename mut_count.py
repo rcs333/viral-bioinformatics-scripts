@@ -60,10 +60,12 @@ def up_count(s1, s2, c1, c2):
 
 
 
-g = open('S2.csv', 'w')
 
-for filepath in glob.glob('S2*.vcf'):
-	for AF_CUTOFF in [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,1]:
+
+for filepath in glob.glob('*.fastq.vcf'):
+	g = open(filepath + '.csv', 'w')
+	print(filepath)
+	for AF_CUTOFF in [0.05]:
 		g_to_t = 0
 		a_count = 0	
 		c_count = 0
@@ -96,9 +98,13 @@ for filepath in glob.glob('S2*.vcf'):
 						if int(line_split[10].split(':')[3]) != 0:
 							if float(line_split[10].split(':')[4]) / float(line_split[10].split(':')[3]) <= AF_CUTOFF:
 								up_count(line_split[3], line_split[4], int(line_split[10].split(':')[3]), int(line_split[10].split(':')[4]))
-		total = a_count + c_count + t_count + g_count + a_to_c + a_to_t + a_to_g + c_to_a + c_to_t + c_to_g + t_to_a + t_to_c + t_to_g + g_to_a + g_to_c + g_to_t
-		print('Total Reads counted: ' + str(total))
-		total = total / 10000.0
+								#print(line)
+		total = a_count + c_count + t_count + g_count# + a_to_c + a_to_t + a_to_g + c_to_a + c_to_t + c_to_g + t_to_a + t_to_c + t_to_g + g_to_a + g_to_c + g_to_t
+		print('Total Bases counted: ' + str(total))
+		if total != 0:
+			total = total / 10000.0
+		else:
+			total = 1
 
 		print()
 		print('A count: ' + str(a_count/total))
@@ -122,11 +128,11 @@ for filepath in glob.glob('S2*.vcf'):
 		print('\tG -> T: ' + str(g_to_t/total))
 
 		info = filepath.split('.')[0]
-
+		print(info)
 		samp = info.split('-')[0]
-		con = info.split('-')[1]
-		prep = info.split('-')[2]
-		qual_score = info.split('-')[3]
+		con = ''
+		prep = info.split('-')[1]
+		qual_score = ''
 		g.write(samp + ',' + prep + ',' + con + ',total,' + str(total) +','+ str(AF_CUTOFF)+ ',' + qual_score +'\n')
 
 		g.write(samp + ',' + prep + ',' + con + ',A,' + str(a_count) +','+ str(AF_CUTOFF)+ ',' + qual_score +'\n')
@@ -148,41 +154,4 @@ for filepath in glob.glob('S2*.vcf'):
 		g.write(samp + ',' + prep + ',' + con + ',GA,' + str(g_to_a/total) + ','+ str(AF_CUTOFF)+ ',' + qual_score +'\n')
 		g.write(samp + ',' + prep + ',' + con + ',GC,' + str(g_to_c/total) + ','+ str(AF_CUTOFF)+ ',' + qual_score +'\n')
 		g.write(samp + ',' + prep + ',' + con + ',GT,' + str(g_to_t/total) + ','+ str(AF_CUTOFF)+ ',' + qual_score +'\n')
-g.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		g.close()
